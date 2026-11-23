@@ -91,3 +91,29 @@ Dalam arsitektur MVC yang diterapkan, kelas Main berperan sebagai Controller yan
   ![MainWindow Sesudah](Screenshot/TP8_Sesudah.png)
 
   ---
+---
+
+## TP10 — Character Manager Sprint #4 (Theming, Properti Komponen & Analisis MVC)
+
+---
+
+### 1. Pemisahan Tanggung Jawab MVC (`AppTheme` vs `Character`)
+Pemetaan warna, font, dan border ditempatkan pada kelas `AppTheme` di package `view` dan bukan di kelas `Character` (package `model`) karena aturan tampilan merupakan tanggung jawab eksklusif layer **View**. Kelas `Character` harus tetap bersih sebagai representasi data domain dan logika bisnis murni tanpa bergantung pada pustaka grafis seperti `java.awt.Color` atau `javax.swing`. Pemisahan ini memastikan kelas `Model` tetap dapat diuji secara independen, digunakan ulang pada antarmuka non-GUI (konsol/API), serta memudahkan perubahan tema visual secara terpusat tanpa menyentuh kode model data.
+
+### 2. Dua Properti Tambahan pada Komponen Swing
+1. **Tooltip Detail Statistik (`setToolTipText` pada Kartu Karakter & Label):**
+   Menampilkan informasi lengkap atribut karakter (termasuk nilai **Mana** dan status **Aktif/Gugur**) saat kursor diarahkan ke kartu, sehingga tampilan kartu utama tetap ringkas dan bersih tanpa kehilangan detail data.
+2. **Border Aksen Per Role (`setBorder` melalui `AppTheme.cardBorderFor`):**
+   Memberikan bingkai garis berwarna terang (`CompoundBorder` dari `LineBorder` dan `EmptyBorder`) yang disesuaikan dengan tipe peran (`WARRIOR`, `MAGE`, `ARCHER`, `HEALER`) untuk mempertegas batas antarkartu dan meningkatkan kontras visual pada tema gelap.
+
+### 3. Link Dokumen Analisis Properti & MVC (Bagian D)
+- Google Docs Analisis TP10: https://docs.google.com/document/d/11Qa_UXXJoiGBNjw51p9qiAKPdALLuSt-ga3dNazZBFI/edit?usp=sharing
+  *(Akses diatur ke: Anyone with the link — Viewer)*
+
+### 4. Screenshots MainWindow (Sebelum v0.3 & Sesudah v0.4)
+- **Screenshot 1 — Sebelum (v0.3 / Tanpa AppTheme & Tanpa Highlight Level Tinggi):**
+  ![MainWindow v0.3 Sebelum](Screenshot/TP8_Sesudah.png)
+- **Screenshot 2 — Sesudah (v0.4 / Dengan AppTheme, Highlight Emas Level ≥ 5, & Border Per Role):**
+  ![MainWindow v0.4 Sesudah](Screenshot/HasilTP10.png)
+
+---
