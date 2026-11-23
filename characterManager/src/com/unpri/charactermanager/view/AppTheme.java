@@ -13,11 +13,17 @@ public class AppTheme {
     // 1. Konstanta Warna Tema Gelap (Dark Theme)
     public static final Color BG_WINDOW = new Color(18, 18, 22);
     public static final Color BG_PANEL_SUBTLE = new Color(26, 27, 32);
+    public static final Color BG_FORM_PANEL = new Color(24, 25, 31);
+    public static final Color BG_INPUT = new Color(34, 36, 44);
     public static final Color STATUS_BAR_BG = new Color(14, 14, 17);
     public static final Color BORDER_SUBTLE_LINE = new Color(50, 53, 62);
+    public static final Color BORDER_ERROR = new Color(235, 65, 65);
     public static final Color TEXT_PRIMARY = Color.WHITE;
     public static final Color TEXT_MUTED = new Color(210, 215, 220);
+    public static final Color TEXT_ERROR = new Color(255, 115, 115);
+    public static final Color TEXT_SUCCESS = new Color(120, 235, 170);
     public static final Color GOLD_HIGHLIGHT = new Color(255, 215, 100);
+    public static final Color BTN_PRIMARY_BG = new Color(45, 130, 225);
 
     // Warna Solid Berdasarkan Role Karakter
     public static final Color ROLE_WARRIOR_BG = new Color(220, 45, 45);
@@ -36,6 +42,9 @@ public class AppTheme {
     // 2. Konstanta Font (Logical Fonts + deriveFont)
     public static final Font FONT_TITLE = new Font(Font.SANS_SERIF, Font.BOLD, 22);
     public static final Font FONT_SUBTITLE = new Font(Font.SANS_SERIF, Font.BOLD, 13);
+    public static final Font FONT_FORM_LABEL = new Font(Font.SANS_SERIF, Font.BOLD, 12);
+    public static final Font FONT_FORM_INPUT = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
+    public static final Font FONT_FEEDBACK = new Font(Font.SANS_SERIF, Font.BOLD, 12);
     public static final Font FONT_CARD = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
     public static final Font FONT_CARD_ELITE = FONT_CARD.deriveFont(Font.BOLD, 14f);
     public static final Font FONT_LEGEND = new Font(Font.MONOSPACED, Font.BOLD, 13);
@@ -45,13 +54,28 @@ public class AppTheme {
 
     // 3. Konstanta Border & Dimensi
     public static final Border BORDER_EMPTY = BorderFactory.createEmptyBorder();
-    public static final Border BORDER_HEADER = BorderFactory.createEmptyBorder(14, 18, 10, 18);
+    public static final Border BORDER_HEADER = BorderFactory.createEmptyBorder(14, 18, 8, 18);
     public static final Border BORDER_STATS_GRID = BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(0, 18, 12, 18),
+            BorderFactory.createEmptyBorder(0, 18, 10, 18),
             BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(BORDER_SUBTLE_LINE, 1),
                     BorderFactory.createEmptyBorder(8, 12, 8, 12)
             )
+    );
+    public static final Border BORDER_FORM_PANEL = BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(0, 18, 10, 18),
+            BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(BORDER_SUBTLE_LINE, 1),
+                    BorderFactory.createEmptyBorder(10, 12, 10, 12)
+            )
+    );
+    public static final Border BORDER_INPUT_NORMAL = BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_SUBTLE_LINE, 1),
+            BorderFactory.createEmptyBorder(5, 8, 5, 8)
+    );
+    public static final Border BORDER_INPUT_ERROR = BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_ERROR, 2),
+            BorderFactory.createEmptyBorder(4, 7, 4, 7)
     );
     public static final Border BORDER_SCROLL = BorderFactory.createEmptyBorder(4, 18, 8, 10);
     public static final Border BORDER_LEGEND_PANEL = BorderFactory.createEmptyBorder(12, 10, 12, 18);
@@ -59,7 +83,7 @@ public class AppTheme {
     public static final Border BORDER_STATUS_BAR = BorderFactory.createEmptyBorder(10, 18, 10, 18);
     private static final Border BORDER_CARD_PADDING = BorderFactory.createEmptyBorder(10, 14, 10, 14);
 
-    public static final Dimension SCROLL_VIEWPORT_SIZE = new Dimension(540, 320);
+    public static final Dimension SCROLL_VIEWPORT_SIZE = new Dimension(540, 270);
     public static final Dimension LEGEND_ITEM_MAX_SIZE = new Dimension(130, 40);
 
     private AppTheme() {

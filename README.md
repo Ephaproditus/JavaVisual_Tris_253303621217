@@ -165,3 +165,71 @@ Google Docs Analisis TP12: https://docs.google.com/document/d/1HfP8PnjSwDrjxAJ1-
 
 **Jendela Dikecilkan (Scrollbar Muncul):**
 ![Jendela Dikecilkan](Screenshot/TP12_Kecil.png)
+
+---
+---
+# Character Manager — TP14 (Sprint #6: Form Input, Validasi & Analisis MVC)
+
+Aplikasi desktop berbasis **Java Swing** (`Character Manager v0.6`) dengan arsitektur **MVC (Model–View–Controller)** untuk mengelola daftar karakter, statistik tim, serta validasi input form berlapis (`View` dan `Model`).
+
+---
+
+## TP14 — Form Input, Validasi & Arsitektur MVC
+
+---
+
+### 1. Pemisahan Lapisan & Aturan Validasi
+- **Lapisan View (`CharacterFormPanel`, `MainWindow`, `AppTheme`)**:
+  - `CharacterFormPanel` menggunakan `JTextField` (nama), `JComboBox<CharacterType>` (role), dan `JSpinner` (level `1–99`), serta menyeragamkan warna, tata letak, dan border error (`AppTheme.BORDER_INPUT_ERROR`) melalui `AppTheme`.
+  - `validateName(...)` memeriksa input secara berurutan (**kelengkapan → panjang → format → keunikan**) dan hanya mengembalikan pesan/hasil validasi tanpa menyentuh komponen UI secara langsung.
+  - Input nama dibersihkan dengan `trim()`, nilai `JSpinner` dibaca setelah `commitEdit()`, error ditampilkan secara *inline* dengan border merah dan fokus kembali ke field terkait, lalu border asli dipulihkan saat input valid.
+  - Karakter yang lolos validasi langsung ditambahkan dan daftar diperbarui melalui `refreshList()` dengan `revalidate()` dan `repaint()` sehingga kartu karakter dan statistik langsung terbarui di layar.
+- **Lapisan Model (`Character`, `CharacterType`, `CharacterManager`)**:
+  - Tidak memiliki dependensi `javax.swing` atau `java.awt`.
+  - Aturan domain pada `Character` menolak nama kosong, *role* `null`, level di luar `1–99`, serta menegakkan **Mini-Challenge: level `MAGE` tidak boleh melebihi `60`** dengan melempar `IllegalArgumentException` (pesannya diteruskan dan ditampilkan di form tanpa mengubah `CharacterFormPanel`).
+  - `CharacterManager` menyediakan `isNameTaken()` serta memvalidasi kapasitas maksimum (`MAX_CHARACTERS = 20`) dan keunikan nama di lapisan *model*.
+
+### 2. Dua Aturan Validasi Tambahan & Alasan Penempatannya
+1. **Larangan nama yang diawali spasi ganda (`View` — `CharacterFormPanel`)**:
+  - **Alasan di `View`**: Aturan ini berkaitan dengan format input teks mentah pada antarmuka pengguna sebelum nilai dibersihkan dan dibentuk menjadi objek domain.
+2. **Batas maksimal 20 karakter dalam total daftar (`Model` — `CharacterManager.MAX_CHARACTERS`)**:
+  - **Alasan di `Model`**: Batas kapasitas koleksi karakter merupakan aturan integritas data domain milik `CharacterManager` agar jumlah data selalu konsisten dari pemanggil mana pun.
+
+### 3. Kompromi Sementara pada Sprint #6
+Pada implementasi Sprint #6 (`v0.6`), penanganan *event* tombol/form menggunakan `ActionListener` minimal dan `CharacterFormPanel` memanggil langsung alur penambahan ke `CharacterManager` melalui *callback* dari `MainWindow`. Kompromi ini dipilih agar pengujian validasi *inline*, pembaruan daftar (`refreshList()`), dan pelaporan status dapat berjalan cepat dan transparan pada tahap ini. Selanjutnya, alur koordinasi akan dirapikan agar *view* tidak bergantung langsung pada pemanggilan *manager*.
+
+### 4. Dokumen Analisis Bagian D (Google Docs)
+- **Nama Dokumen**: `JavaVisual_TP14_253303621217_Trisman Junnedy Ephaproditus Gulo`
+- **Link Google Docs (Bagian D)**: [JavaVisual_TP14_253303621217_Trisman Junnedy Ephaproditus Gulo](https://docs.google.com/document/d/1MKqm98SNKuOg-53IBDwR3xzWJ4y0XrHDFbXmm1S_jiQ/edit?usp=sharing)
+
+---
+
+## Tabel Pengujian Validasi TP14
+
+| No | Input | Hasil Diharapkan | Hasil Nyata | Lapisan yang Menangkap | Bukti *Screenshot* |
+| :-: | :--- | :--- | :--- | :--- | :--- |
+| 1 | Nama: `""` (kosong), Role: `WARRIOR`, Level: `1` | Border merah pada field Nama, pesan *error* *inline* muncul, fokus kembali ke field Nama, jumlah karakter tetap `9`. | Border merah muncul pada field **Nama**, pesan *error* *inline* tampil, fokus kembali ke field **Nama**, dan jumlah karakter tetap `9`. | `View` (`CharacterFormPanel.validateName`) | `Screenshot/TP14_ErrorKosong.png` |
+| 2 | Nama: `"Casanova"` (sudah ada), Role: `WARRIOR`, Level: `1` | Border merah pada field Nama, pesan *error* duplikat muncul, karakter tidak ditambahkan. | Border merah muncul pada field **Nama**, pesan *error* nama duplikat tampil *inline*, dan jumlah karakter tetap `9`. | `View` (`isNameTaken`) & `Model` (`CharacterManager.addCharacter`) | `Screenshot/TP14_ErrorDuplikat.png` |
+| 3 | Nama: `"Tyns"`, Role: `MAGE`, Level: `60` | Border kembali normal, pesan sukses tampil, kartu karakter baru muncul di daftar, statistik terbarui. | Border field **Nama** kembali normal, form ter-*reset* (`Nama` kosong, `Role: MAGE`, `Level: 1`), muncul pesan *"Berhasil menambahkan 'Tyns' (MAGE, Lv.60)."*, kartu `Tyns \| MAGE \| Lv.60 \| HP:1300 \| ATK:315` tampil di daftar, total menjadi `10 karakter`, `Rata-rata Level: 12.90`, `Level Tertinggi: Tyns (Lv.60)`, `Karakter Elite (Lv≥5): 8`, dan status bar menampilkan `Total: 10 karakter \| Siap` (`v0.6`). | Lolos `View` & `Model` (`MAGE` Lv.60 $\le$ 60) | `Screenshot/TP14_Sukses.png` |
+| 4 | Nama: `"  TestSpasi"`, Role: `ARCHER`, Level: `5` | Ditolak dengan pesan *error* format/spasi ganda di awal nama, border merah aktif, data tidak masuk daftar. | Ditolak oleh validasi format nama pada form sebelum penambahan karakter; border merah dan pesan *error* *inline* tampil. | `View` (`CharacterFormPanel.validateName`) | — |
+| 5 | Nama: `"A"`, Role: `WARRIOR`, Level: `5` | Ditolak karena panjang nama kurang dari batas minimum yang diizinkan, pesan *error* *inline* muncul. | Ditolak oleh validasi panjang nama pada form; pesan *error* *inline* dan border merah tampil. | `View` (`CharacterFormPanel.validateName`) | — |
+| 6 | Nama: `"MageTest"`, Role: `MAGE`, Level: `61` | Ditolak karena level `MAGE` melebihi batas maksimal `60`; pesan dari `IllegalArgumentException` tampil di form. | Ditolak oleh aturan domain `MAGE` maksimal level `60` dan menampilkan pesan *error* di form tanpa mengubah `CharacterFormPanel`. | `Model` (`Character.validateCharacterAttributes`) | — |
+| 7 | Nama: `"LevelTest"`, Role: `WARRIOR`, Level: `0` atau `100` | Ditolak karena level di luar rentang `1–99` (`IllegalArgumentException` / batas spinner). | Ditolak dengan pesan *error* rentang level valid (`1–99`) dan karakter tidak ditambahkan. | `Model` (`Character`) & `View` (`JSpinner` `1–99`) | — |
+| 8 | Karakter ke-21 saat daftar sudah berisi `20` karakter (`MAX_CHARACTERS = 20`) | Ditolak karena kapasitas penuh (`maksimal 20 karakter`); pesan *error* kapasitas tampil di form. | Ditolak oleh `CharacterManager.addCharacter()` dengan `IllegalArgumentException` dan pesannya tampil di form. | `Model` (`CharacterManager.addCharacter`) | — |
+
+### Catatan Hasil Uji & Tindakan Perbaikan
+- Pengujian skenario sukses (`Tyns`, `MAGE`, Level `60`) mengonfirmasi bahwa batas maksimal level `60` untuk `MAGE` dapat diproses dengan baik, kartu karakter baru tampil dengan warna tema `MAGE` serta legenda *role* di sisi kanan, dan seluruh indikator statistik serta *status bar* (`v0.6`) ikut terbarui.
+- Perbaikan sebelumnya pada deklarasi kelas yang sempat terduplikasi dan pemanggilan `Character.validateCharacterAttributes(...)` memastikan kompilasi berjalan bersih dan pesan dari `IllegalArgumentException` dapat diteruskan ke form.
+
+---
+
+## Tangkapan Layar TP14
+
+### 1. Error Nama Kosong
+![TP14 Error Nama Kosong](Screenshot/TP14_ErrorKosong.png)
+
+### 2. Error Nama Duplikat
+![TP14 Error Nama Duplikat](Screenshot/TP14_ErrorDuplikat.png)
+
+### 3. Sukses Menambahkan Karakter (`Tyns` — `MAGE` Lv.60)
+![TP14 Sukses Tambah Karakter](Screenshot/TP14_Sukses.png)

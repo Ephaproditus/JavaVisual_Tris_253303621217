@@ -13,7 +13,6 @@ public class MainWindow extends JFrame {
     private final JLabel headerCountLabel;
     private final JLabel statusLeftLabel;
 
-    // Label pada Panel Statistik Tambahan (GridLayout 2x2)
     private final JLabel statTotalValLabel;
     private final JLabel statAvgLevelValLabel;
     private final JLabel statHighestLevelValLabel;
@@ -22,12 +21,12 @@ public class MainWindow extends JFrame {
     public MainWindow(CharacterManager manager) {
         this.manager = manager;
 
-        setTitle("Character Manager v0.5");
+        setTitle("Character Manager v0.6");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
         getContentPane().setBackground(AppTheme.BG_WINDOW);
 
-        // 1. Wilayah NORTH: Header Judul + Panel Statistik GridLayout(2, 2)
+        // 1. Wilayah NORTH: Header + Statistik GridLayout(2,2) + CharacterFormPanel
         JPanel northContainer = new JPanel(new BorderLayout());
         northContainer.setOpaque(true);
         northContainer.setBackground(AppTheme.BG_WINDOW);
@@ -48,7 +47,6 @@ public class MainWindow extends JFrame {
         headerBar.add(titleLabel, BorderLayout.WEST);
         headerBar.add(headerCountLabel, BorderLayout.EAST);
 
-        // Panel Baru Tambahan: Ringkasan Statistik 2x2 (GridLayout)
         JPanel statsGridPanel = new JPanel(new GridLayout(2, 2, 16, 6));
         statsGridPanel.setOpaque(true);
         statsGridPanel.setBackground(AppTheme.BG_PANEL_SUBTLE);
@@ -57,15 +55,23 @@ public class MainWindow extends JFrame {
         statTotalValLabel = createStatLabel("Total Karakter: 0");
         statAvgLevelValLabel = createStatLabel("Rata-rata Level: 0.00");
         statHighestLevelValLabel = createStatLabel("Level Tertinggi: -");
-        statDominantRoleValLabel = createStatLabel("Jumlah Elite (Lv≥5): 0");
+        statDominantRoleValLabel = createStatLabel("Karakter Elite (Lv≥5): 0");
 
         statsGridPanel.add(statTotalValLabel);
         statsGridPanel.add(statAvgLevelValLabel);
         statsGridPanel.add(statHighestLevelValLabel);
         statsGridPanel.add(statDominantRoleValLabel);
 
-        northContainer.add(headerBar, BorderLayout.NORTH);
-        northContainer.add(statsGridPanel, BorderLayout.CENTER);
+        JPanel topHeaderAndStats = new JPanel(new BorderLayout());
+        topHeaderAndStats.setOpaque(true);
+        topHeaderAndStats.setBackground(AppTheme.BG_WINDOW);
+        topHeaderAndStats.add(headerBar, BorderLayout.NORTH);
+        topHeaderAndStats.add(statsGridPanel, BorderLayout.CENTER);
+
+        CharacterFormPanel formPanel = new CharacterFormPanel(manager, this::refreshList);
+
+        northContainer.add(topHeaderAndStats, BorderLayout.NORTH);
+        northContainer.add(formPanel, BorderLayout.CENTER);
         add(northContainer, BorderLayout.NORTH);
 
         // 2. Wilayah CENTER: Panel Pembungkus (NORTH) + Grid Kartu + JScrollPane
@@ -90,7 +96,7 @@ public class MainWindow extends JFrame {
         // 3. Wilayah EAST: Legenda Role dengan BoxLayout Y_AXIS
         add(buildLegendPanel(), BorderLayout.EAST);
 
-        // 4. Wilayah SOUTH: Status Bar (Teks di Kiri & "v0.5" di Kanan)
+        // 4. Wilayah SOUTH: Status Bar (Teks di Kiri & "v0.6" di Kanan)
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setOpaque(true);
         statusBar.setBackground(AppTheme.STATUS_BAR_BG);
@@ -100,7 +106,7 @@ public class MainWindow extends JFrame {
         statusLeftLabel.setFont(AppTheme.FONT_STATUS);
         statusLeftLabel.setForeground(AppTheme.TEXT_PRIMARY);
 
-        JLabel versionRightLabel = new JLabel("v0.5", SwingConstants.RIGHT);
+        JLabel versionRightLabel = new JLabel("v0.6", SwingConstants.RIGHT);
         versionRightLabel.setFont(AppTheme.FONT_STATUS);
         versionRightLabel.setForeground(AppTheme.TEXT_MUTED);
 
@@ -153,7 +159,7 @@ public class MainWindow extends JFrame {
         return legendPanel;
     }
 
-    private void refreshList() {
+    public void refreshList() {
         cardsGridPanel.removeAll();
         List<Character> characters = manager.getAllCharacters();
 

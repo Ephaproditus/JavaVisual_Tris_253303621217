@@ -6,37 +6,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CharacterManager {
+    public static final int MAX_CHARACTERS = 20;
+
     private final List<Character> characterList;
 
     public CharacterManager() {
         this.characterList = new ArrayList<>();
     }
 
-    // Bagian A: Menambahkan karakter dengan validasi anti-duplikat nama
-    public boolean addCharacter(Character c) {
-        if (c == null) return false;
+    public boolean isNameTaken(String name) {
+        if (name == null) return false;
+        String cleaned = name.trim();
+        if (cleaned.isEmpty()) return false;
         for (Character existing : characterList) {
-            if (existing.getName().equalsIgnoreCase(c.getName())) {
-                System.out.println("[WARNING] Karakter dengan nama '" + c.getName() + "' sudah ada! Penambahan ditolak.");
-                return false;
+            if (existing.getName().equalsIgnoreCase(cleaned)) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    public boolean addCharacter(Character c) {
+        if (c == null) {
+            throw new IllegalArgumentException("Objek karakter tidak boleh null.");
+        }
+        if (characterList.size() >= MAX_CHARACTERS) {
+            throw new IllegalArgumentException(
+                    "Kapasitas penuh: maksimal " + MAX_CHARACTERS + " karakter dalam daftar."
+            );
+        }
+        Character.validateCharacterAttributes(c.getName(), c.getType(), c.getLevel(), c.getMana());
+        if (isNameTaken(c.getName())) {
+            throw new IllegalArgumentException(
+                    "Nama karakter '" + c.getName().trim() + "' sudah digunakan. Gunakan nama lain."
+            );
         }
         characterList.add(c);
         return true;
     }
 
-    // Bagian A: Mencari karakter berdasarkan nama (case-insensitive)
     public Character findByName(String name) {
         if (name == null) return null;
         for (Character c : characterList) {
-            if (c.getName().equalsIgnoreCase(name)) {
+            if (c.getName().equalsIgnoreCase(name.trim())) {
                 return c;
             }
         }
         return null;
     }
 
-    // Bagian A: Menghapus karakter berdasarkan nama
     public boolean removeCharacter(String name) {
         Character target = findByName(name);
         if (target != null) {
@@ -45,17 +63,14 @@ public class CharacterManager {
         return false;
     }
 
-    // Bagian A: Mengembalikan jumlah total karakter
     public int getTotalCharacters() {
         return characterList.size();
     }
 
-    // Bagian A: Mengembalikan salinan list (Defensive Copying) agar list asli terlindungi
     public List<Character> getAllCharacters() {
         return new ArrayList<>(characterList);
     }
 
-    // Bagian B (Mini-Challenge): Menghitung rata-rata level (aman dari pembagian nol)
     public double getAverageLevel() {
         if (characterList.isEmpty()) {
             return 0.0;
@@ -67,7 +82,6 @@ public class CharacterManager {
         return totalLevel / characterList.size();
     }
 
-    // Bagian B (Mini-Challenge): Mengembalikan daftar karakter berdasarkan tipe tertentu
     public ArrayList<Character> findByType(CharacterType type) {
         ArrayList<Character> result = new ArrayList<>();
         for (Character c : characterList) {
@@ -78,16 +92,6 @@ public class CharacterManager {
         return result;
     }
 
-    /**
-     * Bagian C (Fitur Analitik Rancangan Sendiri):
-     * Mengubah nama karakter yang sudah ada menjadi nama baru dengan validasi ketat
-     * untuk mencegah nama kosong atau bentrok (duplikat) dengan karakter lain,
-     * serta menjaga encapsulation dengan tidak mengekspos list internal.
-     *
-     * @param oldName Nama karakter lama yang ingin diubah
-     * @param newName Nama baru yang diinginkan
-     * @return true jika perubahan nama berhasil, false jika karakter tidak ditemukan atau nama bentrok
-     */
     public boolean renameCharacter(String oldName, String newName) {
         if (oldName == null || newName == null || newName.trim().isEmpty()) {
             return false;
@@ -97,7 +101,7 @@ public class CharacterManager {
             System.out.println("[ERROR] Karakter '" + oldName + "' tidak ditemukan.");
             return false;
         }
-        if (!oldName.equalsIgnoreCase(newName) && findByName(newName) != null) {
+        if (!oldName.equalsIgnoreCase(newName.trim()) && isNameTaken(newName)) {
             System.out.println("[ERROR] Nama baru '" + newName + "' sudah digunakan oleh karakter lain!");
             return false;
         }
