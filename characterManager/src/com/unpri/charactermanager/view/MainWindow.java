@@ -9,19 +9,29 @@ import javax.swing.*;
 
 public class MainWindow extends JFrame {
     private final CharacterManager manager;
-    private final JPanel listPanel;
+    private final JPanel cardsGridPanel;
     private final JLabel headerCountLabel;
-    private final JLabel statusLabel;
+    private final JLabel statusLeftLabel;
+
+    // Label pada Panel Statistik Tambahan (GridLayout 2x2)
+    private final JLabel statTotalValLabel;
+    private final JLabel statAvgLevelValLabel;
+    private final JLabel statHighestLevelValLabel;
+    private final JLabel statDominantRoleValLabel;
 
     public MainWindow(CharacterManager manager) {
         this.manager = manager;
 
-        setTitle("Character Manager v0.4 - TP10");
+        setTitle("Character Manager v0.5");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
         getContentPane().setBackground(AppTheme.BG_WINDOW);
 
-        // 1. Header Atas
+        // 1. Wilayah NORTH: Header Judul + Panel Statistik GridLayout(2, 2)
+        JPanel northContainer = new JPanel(new BorderLayout());
+        northContainer.setOpaque(true);
+        northContainer.setBackground(AppTheme.BG_WINDOW);
+
         JPanel headerBar = new JPanel(new BorderLayout());
         headerBar.setOpaque(true);
         headerBar.setBackground(AppTheme.BG_WINDOW);
@@ -37,47 +47,77 @@ public class MainWindow extends JFrame {
 
         headerBar.add(titleLabel, BorderLayout.WEST);
         headerBar.add(headerCountLabel, BorderLayout.EAST);
-        add(headerBar, BorderLayout.NORTH);
 
-        // 2. Daftar Karakter Dinamis (Tengah)
-        listPanel = new JPanel();
-        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        listPanel.setOpaque(true);
-        listPanel.setBackground(AppTheme.BG_WINDOW);
-        listPanel.setBorder(AppTheme.BORDER_LIST_PANEL);
+        // Panel Baru Tambahan: Ringkasan Statistik 2x2 (GridLayout)
+        JPanel statsGridPanel = new JPanel(new GridLayout(2, 2, 16, 6));
+        statsGridPanel.setOpaque(true);
+        statsGridPanel.setBackground(AppTheme.BG_PANEL_SUBTLE);
+        statsGridPanel.setBorder(AppTheme.BORDER_STATS_GRID);
 
-        JScrollPane scrollPane = new JScrollPane(listPanel);
-        scrollPane.setBorder(AppTheme.BORDER_EMPTY);
+        statTotalValLabel = createStatLabel("Total Karakter: 0");
+        statAvgLevelValLabel = createStatLabel("Rata-rata Level: 0.00");
+        statHighestLevelValLabel = createStatLabel("Level Tertinggi: -");
+        statDominantRoleValLabel = createStatLabel("Jumlah Elite (Lv≥5): 0");
+
+        statsGridPanel.add(statTotalValLabel);
+        statsGridPanel.add(statAvgLevelValLabel);
+        statsGridPanel.add(statHighestLevelValLabel);
+        statsGridPanel.add(statDominantRoleValLabel);
+
+        northContainer.add(headerBar, BorderLayout.NORTH);
+        northContainer.add(statsGridPanel, BorderLayout.CENTER);
+        add(northContainer, BorderLayout.NORTH);
+
+        // 2. Wilayah CENTER: Panel Pembungkus (NORTH) + Grid Kartu + JScrollPane
+        JPanel scrollWrapperPanel = new JPanel(new BorderLayout());
+        scrollWrapperPanel.setOpaque(true);
+        scrollWrapperPanel.setBackground(AppTheme.BG_WINDOW);
+
+        cardsGridPanel = new JPanel(new GridLayout(0, 1, 0, 10));
+        cardsGridPanel.setOpaque(true);
+        cardsGridPanel.setBackground(AppTheme.BG_WINDOW);
+        scrollWrapperPanel.add(cardsGridPanel, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(scrollWrapperPanel);
+        scrollPane.setBorder(AppTheme.BORDER_SCROLL);
         scrollPane.setOpaque(true);
         scrollPane.setBackground(AppTheme.BG_WINDOW);
         scrollPane.getViewport().setBackground(AppTheme.BG_WINDOW);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setPreferredSize(AppTheme.SCROLL_VIEWPORT_SIZE);
         add(scrollPane, BorderLayout.CENTER);
 
-        // 3. Legenda Role (Kanan)
+        // 3. Wilayah EAST: Legenda Role dengan BoxLayout Y_AXIS
         add(buildLegendPanel(), BorderLayout.EAST);
 
-        // 4. Status Bar Bawah (Total Karakter & Rata-rata Level)
+        // 4. Wilayah SOUTH: Status Bar (Teks di Kiri & "v0.5" di Kanan)
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setOpaque(true);
         statusBar.setBackground(AppTheme.STATUS_BAR_BG);
         statusBar.setBorder(AppTheme.BORDER_STATUS_BAR);
 
-        statusLabel = new JLabel("Total: 0 karakter  |  Rata-rata Level: 0.00  |  Siap");
-        statusLabel.setFont(AppTheme.FONT_STATUS);
-        statusLabel.setForeground(AppTheme.TEXT_PRIMARY);
+        statusLeftLabel = new JLabel("Total: 0 karakter  |  Siap");
+        statusLeftLabel.setFont(AppTheme.FONT_STATUS);
+        statusLeftLabel.setForeground(AppTheme.TEXT_PRIMARY);
 
-        JLabel rightTag = new JLabel("v0.4 · TP10", SwingConstants.RIGHT);
-        rightTag.setFont(AppTheme.FONT_STATUS);
-        rightTag.setForeground(AppTheme.TEXT_MUTED);
+        JLabel versionRightLabel = new JLabel("v0.5", SwingConstants.RIGHT);
+        versionRightLabel.setFont(AppTheme.FONT_STATUS);
+        versionRightLabel.setForeground(AppTheme.TEXT_MUTED);
 
-        statusBar.add(statusLabel, BorderLayout.WEST);
-        statusBar.add(rightTag, BorderLayout.EAST);
+        statusBar.add(statusLeftLabel, BorderLayout.WEST);
+        statusBar.add(versionRightLabel, BorderLayout.EAST);
         add(statusBar, BorderLayout.SOUTH);
 
         refreshList();
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private JLabel createStatLabel(String initialText) {
+        JLabel label = new JLabel(initialText);
+        label.setFont(AppTheme.FONT_STATS_VALUE);
+        label.setForeground(AppTheme.TEXT_MUTED);
+        return label;
     }
 
     private JPanel buildLegendPanel() {
@@ -102,34 +142,44 @@ public class MainWindow extends JFrame {
             itemLabel.setOpaque(true);
             itemLabel.setBackground(AppTheme.colorFor(type));
             itemLabel.setBorder(AppTheme.BORDER_LEGEND_ITEM);
+            itemLabel.setMaximumSize(AppTheme.LEGEND_ITEM_MAX_SIZE);
             itemLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             legendPanel.add(itemLabel);
             legendPanel.add(Box.createVerticalStrut(10));
         }
 
+        legendPanel.add(Box.createVerticalGlue());
         return legendPanel;
     }
 
     private void refreshList() {
-        listPanel.removeAll();
+        cardsGridPanel.removeAll();
         List<Character> characters = manager.getAllCharacters();
+
+        int maxLevel = 0;
+        String topCharName = "-";
+        int eliteCount = 0;
 
         for (Character c : characters) {
             boolean isElite = c.getLevel() >= AppTheme.HIGH_LEVEL_THRESHOLD;
+            if (isElite) {
+                eliteCount++;
+            }
+            if (c.getLevel() > maxLevel) {
+                maxLevel = c.getLevel();
+                topCharName = c.getName() + " (Lv." + c.getLevel() + ")";
+            }
 
             JPanel card = new JPanel(new BorderLayout());
             card.setOpaque(true);
             card.setBackground(AppTheme.colorFor(c.getType()));
-            // Properti Tambahan 2: Border berbeda sesuai role karakter
             card.setBorder(AppTheme.cardBorderFor(c.getType()));
-            card.setMaximumSize(AppTheme.CARD_MAX_SIZE);
 
-            // Properti Tambahan 1: Tooltip detail statistik lengkap (termasuk Mana & Status)
             String tooltipText = String.format(
-                    "%s (%s) — Lv.%d | HP: %d | ATK: %d | Mana: %d | Status: %s",
-                    c.getName(), c.getType(), c.getLevel(), c.getHitPoints(),
-                    c.getAttackPower(), c.getMana(), c.isAlive() ? "Aktif" : "Gugur"
+                    "%s (%s) — Lv.%d | HP: %d | ATK: %d | Mana: %d",
+                    c.getName(), c.getType(), c.getLevel(),
+                    c.getHitPoints(), c.getAttackPower(), c.getMana()
             );
             card.setToolTipText(tooltipText);
 
@@ -139,23 +189,26 @@ public class MainWindow extends JFrame {
             );
 
             JLabel infoLabel = new JLabel(text);
-            // Mini-Challenge: Level >= HIGH_LEVEL_THRESHOLD memakai teks emas dan tebal
             infoLabel.setFont(isElite ? AppTheme.FONT_CARD_ELITE : AppTheme.FONT_CARD);
             infoLabel.setForeground(isElite ? AppTheme.GOLD_HIGHLIGHT : AppTheme.TEXT_PRIMARY);
             infoLabel.setToolTipText(tooltipText);
 
             card.add(infoLabel, BorderLayout.WEST);
-            listPanel.add(card);
-            listPanel.add(Box.createVerticalStrut(10));
+            cardsGridPanel.add(card);
         }
 
         int total = manager.getTotalCharacters();
         double avg = manager.getAverageLevel();
 
         headerCountLabel.setText(total + " karakter");
-        statusLabel.setText(String.format("Total: %d karakter  |  Rata-rata Level: %.2f  |  Siap", total, avg));
+        statusLeftLabel.setText("Total: " + total + " karakter  |  Siap");
 
-        listPanel.revalidate();
-        listPanel.repaint();
+        statTotalValLabel.setText("Total Karakter: " + total);
+        statAvgLevelValLabel.setText(String.format("Rata-rata Level: %.2f", avg));
+        statHighestLevelValLabel.setText("Level Tertinggi: " + topCharName);
+        statDominantRoleValLabel.setText("Karakter Elite (Lv≥" + AppTheme.HIGH_LEVEL_THRESHOLD + "): " + eliteCount);
+
+        cardsGridPanel.revalidate();
+        cardsGridPanel.repaint();
     }
 }

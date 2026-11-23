@@ -7,12 +7,14 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class AppTheme {
-    // Konstanta Ambang Level Mini-Challenge
+    // Konstanta Ambang Level Mini-Challenge TP10
     public static final int HIGH_LEVEL_THRESHOLD = 5;
 
     // 1. Konstanta Warna Tema Gelap (Dark Theme)
     public static final Color BG_WINDOW = new Color(18, 18, 22);
+    public static final Color BG_PANEL_SUBTLE = new Color(26, 27, 32);
     public static final Color STATUS_BAR_BG = new Color(14, 14, 17);
+    public static final Color BORDER_SUBTLE_LINE = new Color(50, 53, 62);
     public static final Color TEXT_PRIMARY = Color.WHITE;
     public static final Color TEXT_MUTED = new Color(210, 215, 220);
     public static final Color GOLD_HIGHLIGHT = new Color(255, 215, 100);
@@ -24,7 +26,7 @@ public class AppTheme {
     public static final Color ROLE_HEALER_BG = new Color(115, 105, 235);
     public static final Color ROLE_DEFAULT_BG = new Color(80, 85, 95);
 
-    // Warna Aksen Border Kartu Berdasarkan Role (Properti Tambahan 2)
+    // Warna Aksen Border Kartu Berdasarkan Role
     private static final Color BORDER_WARRIOR_ACCENT = new Color(255, 140, 140);
     private static final Color BORDER_MAGE_ACCENT = new Color(135, 210, 255);
     private static final Color BORDER_ARCHER_ACCENT = new Color(135, 245, 215);
@@ -38,19 +40,27 @@ public class AppTheme {
     public static final Font FONT_CARD_ELITE = FONT_CARD.deriveFont(Font.BOLD, 14f);
     public static final Font FONT_LEGEND = new Font(Font.MONOSPACED, Font.BOLD, 13);
     public static final Font FONT_STATS = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
+    public static final Font FONT_STATS_VALUE = new Font(Font.MONOSPACED, Font.BOLD, 13);
     public static final Font FONT_STATUS = new Font(Font.MONOSPACED, Font.PLAIN, 13);
 
     // 3. Konstanta Border & Dimensi
     public static final Border BORDER_EMPTY = BorderFactory.createEmptyBorder();
-    public static final Border BORDER_HEADER = BorderFactory.createEmptyBorder(16, 18, 12, 18);
-    public static final Border BORDER_LIST_PANEL = BorderFactory.createEmptyBorder(6, 18, 12, 10);
+    public static final Border BORDER_HEADER = BorderFactory.createEmptyBorder(14, 18, 10, 18);
+    public static final Border BORDER_STATS_GRID = BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(0, 18, 12, 18),
+            BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(BORDER_SUBTLE_LINE, 1),
+                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            )
+    );
+    public static final Border BORDER_SCROLL = BorderFactory.createEmptyBorder(4, 18, 8, 10);
     public static final Border BORDER_LEGEND_PANEL = BorderFactory.createEmptyBorder(12, 10, 12, 18);
     public static final Border BORDER_LEGEND_ITEM = BorderFactory.createEmptyBorder(10, 14, 10, 14);
     public static final Border BORDER_STATUS_BAR = BorderFactory.createEmptyBorder(10, 18, 10, 18);
     private static final Border BORDER_CARD_PADDING = BorderFactory.createEmptyBorder(10, 14, 10, 14);
 
-    public static final Dimension SCROLL_VIEWPORT_SIZE = new Dimension(540, 340);
-    public static final Dimension CARD_MAX_SIZE = new Dimension(Integer.MAX_VALUE, 52);
+    public static final Dimension SCROLL_VIEWPORT_SIZE = new Dimension(540, 320);
+    public static final Dimension LEGEND_ITEM_MAX_SIZE = new Dimension(130, 40);
 
     private AppTheme() {
     }
